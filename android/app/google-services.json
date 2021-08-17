@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "290397659465",
+    "project_id": "moviebuff-b5533",
+    "storage_bucket": "moviebuff-b5533.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:290397659465:android:de5c131e2084fa506afa98",
+        "android_client_info": {
+          "package_name": "com.example.movirbuff"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "290397659465-lbr29j073n3cf52c4124varonl5hld6m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyABRKD1C4A8ZlLTrYIe8VnkaWsJHWeStv0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "290397659465-lbr29j073n3cf52c4124varonl5hld6m.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
