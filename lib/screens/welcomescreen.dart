@@ -72,6 +72,27 @@ class _WelcomeScreenState extends State<WelcomeScreen> with SingleTickerProvider
             roundedbutton(name: "Sign up",onpress: () {
               Navigator.pushNamed(context,RegistrationScreen.id);
             },),
+            SizedBox(
+              height: 20.0,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 30.0,right: 30.0),
+              child: Row(
+                children: <Widget>[
+                  Text('powered with ',style: TextStyle(fontWeight: FontWeight.bold),),
+                  SizedBox(
+                    width: 20.0,
+                  ),
+                  Hero(
+                    tag: 'logo_2',
+                    child: Container(
+                      child: Image.asset('images/logo_2.png'),
+                      height: 60.0,
+                    ),
+                  ),
+                ],
+              ),
+            )
           ],
         ),
       ),
