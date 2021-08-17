@@ -3,6 +3,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:movirbuff/model/note.dart';
 import 'package:movirbuff/util/database_helper.dart';
 import 'Movie_detail.dart';
+import 'package:movirbuff/util/Utility.dart';
 class MovieList extends StatefulWidget {
 static String id="Ml";
   @override
@@ -37,7 +38,7 @@ class MovieListState extends State<MovieList> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           debugPrint('FAB clicked');
-          navigateToDetail(Note('', '', 2), 'Add Note');
+          navigateToDetail(Note('', ''), 'Add Note');
         },
 
         tooltip: 'Add Note',
@@ -60,12 +61,9 @@ class MovieListState extends State<MovieList> {
           elevation: 2.0,
           child: ListTile(
 
-            leading: CircleAvatar(
-              backgroundColor: getPriorityColor(this.noteList[position].priority),
-              child: getPriorityIcon(this.noteList[position].priority),
-            ),
+            leading: Utility.imageFromBase64String(this.noteList[position].picture),
 
-            title: Text(this.noteList[position].title, style: titleStyle,),
+            title: Center(child: Text(this.noteList[position].title, style:titleStyle)),
 
             subtitle: Text(this.noteList[position].date),
 
@@ -92,31 +90,19 @@ class MovieListState extends State<MovieList> {
   Color getPriorityColor(int priority) {
     switch (priority) {
       case 1:
-        return Colors.red;
+        return Colors.green;
         break;
       case 2:
-        return Colors.yellow;
+        return Colors.red;
         break;
 
       default:
-        return Colors.yellow;
+        return Colors.red;
     }
   }
 
   // Returns the priority icon
-  Icon getPriorityIcon(int priority) {
-    switch (priority) {
-      case 1:
-        return Icon(Icons.play_arrow);
-        break;
-      case 2:
-        return Icon(Icons.keyboard_arrow_right);
-        break;
 
-      default:
-        return Icon(Icons.keyboard_arrow_right);
-    }
-  }
 
   void _delete(BuildContext context, Note note) async {
 

@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:movirbuff/model/note.dart';
 import 'package:movirbuff/util/database_helper.dart';
 import 'package:intl/intl.dart';
+import 'dart:io';
+import 'dart:async';
+import 'package:image_picker/image_picker.dart';
+import 'package:movirbuff/util/Utility.dart';
 class MovieDetail extends StatefulWidget {
 
   final String appBarTitle;
@@ -19,12 +23,14 @@ class MovieDetail extends StatefulWidget {
 class MovieDetailState extends State<MovieDetail> {
 
   static var _priorities = ['New', 'Old'];
-
+   Future<File> imagefile;
+   Image image;
   DatabaseHelper helper = DatabaseHelper();
 
   String appBarTitle;
   Note note;
-
+  IconData ch=Icons.add;
+var _formkey=GlobalKey<FormState>();
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
 
@@ -58,6 +64,7 @@ class MovieDetailState extends State<MovieDetail> {
           ),
 
           body: Form(
+            key: _formkey,
             child: Padding(
               padding: EdgeInsets.only(top: 15.0, left: 10.0, right: 10.0),
               child: ListView(
@@ -65,24 +72,39 @@ class MovieDetailState extends State<MovieDetail> {
 
                   // First element
                   ListTile(
-                    title: DropdownButton(
-                        items: _priorities.map((String dropDownStringItem) {
-                          return DropdownMenuItem<String> (
-                            value: dropDownStringItem,
-                            child: Text(dropDownStringItem),
-                          );
-                        }).toList(),
-
-                        style: textStyle,
-
-                        value: getPriorityAsString(note.priority),
-
-                        onChanged: (valueSelectedByUser) {
+                    title: Row(
+                      children: [
+                        Text("ADD IMAGE :  "),
+                        IconButton(icon:Icon(ch), onPressed:(){
+                          pickImageFromGallery(ImageSource.gallery);
                           setState(() {
-                            debugPrint('User selected $valueSelectedByUser');
-                            updatePriorityAsInt(valueSelectedByUser);
+                            ch=Icons.done;
                           });
-                        }
+                        }),
+                        SizedBox(
+                          width:40.0
+                        ),
+                        // Text("TYPE :  "),
+                        // DropdownButton(
+                        //     items: _priorities.map((String dropDownStringItem) {
+                        //       return DropdownMenuItem<String> (
+                        //         value: dropDownStringItem,
+                        //         child: Text(dropDownStringItem),
+                        //       );
+                        //     }).toList(),
+                        //
+                        //     style: textStyle,
+                        //
+                        //     value: getPriorityAsString(note.priority),
+                        //
+                        //     onChanged: (valueSelectedByUser) {
+                        //       setState(() {
+                        //         debugPrint('User selected $valueSelectedByUser');
+                        //         updatePriorityAsInt(valueSelectedByUser);
+                        //       });
+                        //     }
+                        // ),
+                      ],
                     ),
                   ),
 
@@ -90,11 +112,10 @@ class MovieDetailState extends State<MovieDetail> {
                   Padding(
                     padding: EdgeInsets.only(top: 15.0, bottom: 15.0),
                     child: TextFormField(
-                      validator: (value) {
+                      validator: (String value) {
                   if (value == null || value.isEmpty) {
                   return 'Please enter some text';
                   }
-                  return null;
                   },
                       controller: titleController,
                       style: textStyle,
@@ -125,7 +146,6 @@ class MovieDetailState extends State<MovieDetail> {
                       controller: descriptionController,
                       style: textStyle,
                       onChanged: (value) {
-                        debugPrint('Something changed in Description Text Field');
                         updateDescription();
                       },
                       decoration: InputDecoration(
@@ -153,9 +173,13 @@ class MovieDetailState extends State<MovieDetail> {
                             ),
                             onPressed: () {
                               setState(() {
-                                debugPrint("Save button clicked");
+                                if(_formkey.currentState.validate() && note.picture!=null)
                                 _save();
-                              });
+                                else
+                                  _showAlertDialog('status', 'fill everything');
+                              }
+
+                              );
                             },
                           ),
                         ),
@@ -172,7 +196,6 @@ class MovieDetailState extends State<MovieDetail> {
                             ),
                             onPressed: () {
                               setState(() {
-                                debugPrint("Delete button clicked");
                                 _delete();
                               });
                             },
@@ -196,16 +219,7 @@ class MovieDetailState extends State<MovieDetail> {
   }
 
   // Convert the String priority in the form of integer before saving it to Database
-  void updatePriorityAsInt(String value) {
-    switch (value) {
-      case 'High':
-        note.priority = 1;
-        break;
-      case 'Low':
-        note.priority = 2;
-        break;
-    }
-  }
+
 
   // Convert int priority to String priority and display it to user in DropDown
   String getPriorityAsString(int value) {
@@ -230,7 +244,6 @@ class MovieDetailState extends State<MovieDetail> {
   void updateDescription() {
     note.description = descriptionController.text;
   }
-
   // Save data to database
   void _save() async {
 
@@ -245,7 +258,7 @@ class MovieDetailState extends State<MovieDetail> {
     }
 
     if (result != 0) {  // Success
-      _showAlertDialog('Status', 'Note Saved Successfully');
+      _showAlertDialog('Status', 'Movie Saved Successfully');
     } else {  // Failure
       _showAlertDialog('Status', 'Problem Saving Note');
     }
@@ -259,14 +272,14 @@ class MovieDetailState extends State<MovieDetail> {
     // Case 1: If user is trying to delete the NEW NOTE i.e. he has come to
     // the detail page by pressing the FAB of NoteList page.
     if (note.id == null) {
-      _showAlertDialog('Status', 'No Note was deleted');
+      _showAlertDialog('Status', 'No Movie was deleted');
       return;
     }
 
     // Case 2: User is trying to delete the old note that already has a valid ID.
     int result = await helper.deleteNote(note.id);
     if (result != 0) {
-      _showAlertDialog('Status', 'Note Deleted Successfully');
+      _showAlertDialog('Status', 'Movie Deleted Successfully');
     } else {
       _showAlertDialog('Status', 'Error Occured while Deleting Note');
     }
@@ -283,5 +296,38 @@ class MovieDetailState extends State<MovieDetail> {
         builder: (_) => alertDialog
     );
   }
+
+pickImageFromGallery(ImageSource source)
+{
+  setState(() {
+    imagefile= ImagePicker.pickImage(source: source).then((imgfile) {
+      String imgstring=Utility.base64String(imgfile.readAsBytesSync());
+note.picture=imgstring;
+    });
+  });
+
+}
+
+
+// Widget imageFromGallery(){
+//    return FutureBuilder<File>(
+//      future: imagefile,
+//      builder:(BuildContext context,AsyncSnapshot<File> snapshot){
+// if(snapshot.connectionState==ConnectionState.done){
+//   if(null==snapshot.data)
+//     {
+//       return const Text("error",textAlign: TextAlign.center,);
+//     }
+//   return Image.file(snapshot.data);
+// }
+// if(null!=snapshot.error){
+//   return const Text('error picking image',textAlign:TextAlign.center );
+// }
+// return const Text('no image selected',textAlign: TextAlign.center,)
+//      } ,
+//    );
+// }
+
+
 
 }
